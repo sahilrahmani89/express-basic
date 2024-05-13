@@ -1,0 +1,1 @@
+const serverPage = require('./server/server.js')
