@@ -33,6 +33,12 @@ app.use(express.json());
 //static file
 app.use(express.static(path.join(__dirname,'..','/public')))
 
+
+app.use('/somepage',require('./../routes/routes'))
+// above is one for to sub folder  where  use route middleware 
+//// api route
+app.use('/api/user',require('./../api/user'))
+/// api route
 app.get('^/$|/index(.html)?',(req,res)=>{
     // res.send('hello there!')
     res.sendFile(path.join(__dirname,'..','pages','index.html'))
