@@ -39,6 +39,8 @@ app.use('/somepage',require('./../routes/routes'))
 //// api route
 app.use('/api/user',require('./../api/user'))
 /// api route
+app.use('/api/signup',require('../routes/signup')) //signup route
+app.use('/api/login',require('../routes/login'))
 app.get('^/$|/index(.html)?',(req,res)=>{
     // res.send('hello there!')
     res.sendFile(path.join(__dirname,'..','pages','index.html'))
