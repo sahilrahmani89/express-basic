@@ -6,7 +6,10 @@ setUser:function(data){
 
 
 const bcrypt = require('bcrypt')
-
+const jwt = require('jsonwebtoken')
+const path = require('path')
+const fsPromises = require('fs').promises
+require('dotenv').config()
 
 const login=async(req,res) =>{
     const {username,password} = req.body
@@ -20,7 +23,25 @@ const login=async(req,res) =>{
     // try{
        const passwordCheck = await bcrypt.compare(password,isUser.password)
        if(passwordCheck){
-        res.status(200).json({'message':'yep Logged in'})
+        const accessToken =  jwt.sign(
+            {"username":isUser?.username},
+            process.env.ACCESS_TOKEN_SECRET,
+            {expiresIn:'30s'}
+        )
+        const refreshToken =  jwt.sign(
+            {"username":isUser?.username},
+            process.env.REFRESH_TOKEN_SECRET,
+            {expiresIn:'2d'}
+        )
+        const notCurrentUser = userDB?.user.filter((item)=>item.username!==isUser?.username)
+        const currentUser = {...isUser,refreshToken}
+        userDB.setUser([...notCurrentUser,currentUser])
+        await fsPromises.writeFile(
+            path.join(__dirname,'..','model','auth.json'),
+            JSON.stringify(userDB.user)
+        )
+        res.cookie('jwt',refreshToken,{httpOnly:true,maxAge:24*60*60*1000})
+        res.status(200).json({accessToken})
        }else{
         res.status(401).json({'message':'Password not match'})
        }
